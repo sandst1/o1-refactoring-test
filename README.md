@@ -37,7 +37,7 @@ All of the LLMs were able to (eventually) make changes that still work and tests
 
 ### claude-3.5-sonnet
 
-PR: https://github.com/sandst1/o1-refactoring-test/pull/2
+[PR for claude-3.5-sonnet](https://github.com/sandst1/o1-refactoring-test/pull/2)
 
 **Process**: After first try, book service code was refactored but tests & app not, so they were failing. Giving the failures to Claude and asking to fix them made things pass again. Also the app itself was failing, after one iteration Claude fixed that as well.
 
@@ -45,7 +45,7 @@ PR: https://github.com/sandst1/o1-refactoring-test/pull/2
 
 ### gpt-4o
 
-PR: https://github.com/sandst1/o1-refactoring-test/pull/1
+[PR for gpt-4o](https://github.com/sandst1/o1-refactoring-test/pull/1)
 
 **Process**: After refactoring app, bookService and tests, one test was failing. This was because it was trying to find bookService from a folder `service` that never existed. After pointing this out, the import was fixed. After that, one test was still failing. 4o wasn't able to fix the test even after a few iterations and a fresh chat with the full codebase.
 
@@ -53,7 +53,7 @@ PR: https://github.com/sandst1/o1-refactoring-test/pull/1
 
 ### o1-mini
 
-PR: https://github.com/sandst1/o1-refactoring-test/pull/3
+[PR for o1-mini](https://github.com/sandst1/o1-refactoring-test/pull/3)
 
 **Process**: Refactored app and bookService but tests were failing because of naming changes. After giving the test results, o1 decided to return to original function naming while preserving the structural code improvements. After this one test was failing, which o1 fixed.
 
@@ -64,7 +64,7 @@ updated `.gitignore`, renamed the project description in `package.json` from "An
 
 ### o1-preview
 
-PR: https://github.com/sandst1/o1-refactoring-test/pull/4
+[PR for o1-preview](https://github.com/sandst1/o1-refactoring-test/pull/4)
 
 **Process**: Refactored app, tests and book service. App was working but all of the tests were failing. o1-preview fixed them in one go by adjusting bookService. After that the app wasn't working anymore because it wasn't adjusted, which was also fixed after pointing that out.
 
