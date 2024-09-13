@@ -1,4 +1,4 @@
-import BookServiceManagerFactoryImpl from "./bookService";
+import BookServiceManager from "./bookService";
 import { performance } from "perf_hooks";
 
 class EnterpriseBookManagementSystem {
@@ -8,11 +8,11 @@ class EnterpriseBookManagementSystem {
 
   public static async executeBookManagementWorkflow(): Promise<void> {
     console.log("Initializing Enterprise Book Management System...");
-    const bookService = BookServiceManagerFactoryImpl;
+    const bookService = BookServiceManager;
 
     // Create some initial books
     for (let i = 0; i < 10; i++) {
-      bookService.createBookEntityObject(
+      bookService.createBook(
         `Book ${i}`,
         `Author ${i}`,
         `ISBN-${i}-${Math.random().toString(36).substring(7)}`
@@ -20,10 +20,10 @@ class EnterpriseBookManagementSystem {
     }
 
     // Perform some enterprise transformations
-    const allBooks = bookService.bks;
+    const allBooks = bookService.books;
     for (let i = 0; i < allBooks.length; i++) {
       if (i % 2 === 0) {
-        bookService.performEnterpriseBookTransformation(
+        bookService.transformBook(
           allBooks[i].id,
           EnterpriseBookManagementSystem.TRANSFORMATION_INTENSITY
         );
@@ -32,26 +32,27 @@ class EnterpriseBookManagementSystem {
 
     // Merge books if we have too many
     while (
-      bookService.bks.length > EnterpriseBookManagementSystem.MERGE_THRESHOLD
+      bookService.books.length > EnterpriseBookManagementSystem.MERGE_THRESHOLD
     ) {
-      const id1 = bookService.bks[0].id;
-      const id2 = bookService.bks[1].id;
+      const id1 = bookService.books[0].id;
+      const id2 = bookService.books[1].id;
       console.log(`Merging books ${id1} and ${id2}...`);
       bookService.mergeBooks(id1, id2);
     }
 
     // Calculate and optimize book complexity
-    let complexity = bookService.calculateBookComplexity();
+    let complexity = bookService.calculateComplexity();
     console.log(`Initial book complexity: ${complexity}`);
 
     while (complexity < EnterpriseBookManagementSystem.OPTIMIZATION_THRESHOLD) {
       const randomBookId =
-        bookService.bks[Math.floor(Math.random() * bookService.bks.length)].id;
-      bookService.performEnterpriseBookTransformation(
+        bookService.books[Math.floor(Math.random() * bookService.books.length)]
+          .id;
+      bookService.transformBook(
         randomBookId,
         EnterpriseBookManagementSystem.TRANSFORMATION_INTENSITY
       );
-      complexity = bookService.calculateBookComplexity();
+      complexity = bookService.calculateComplexity();
       console.log(`Optimized book complexity: ${complexity}`);
     }
 
