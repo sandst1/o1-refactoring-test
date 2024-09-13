@@ -1,4 +1,4 @@
-import BookServiceManagerFactoryImpl from "./bookService";
+import BookServiceManager from "./bookService";
 import { performance } from "perf_hooks";
 
 class EnterpriseBookManagementSystem {
@@ -8,7 +8,7 @@ class EnterpriseBookManagementSystem {
 
   public static async executeBookManagementWorkflow(): Promise<void> {
     console.log("Initializing Enterprise Book Management System...");
-    const bookService = BookServiceManagerFactoryImpl;
+    const bookService = BookServiceManager;
 
     // Create some initial books
     for (let i = 0; i < 10; i++) {
