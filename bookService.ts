@@ -1,137 +1,135 @@
 import { randomBytes } from "crypto";
 import * as fs from "fs";
 
-class BookServiceManagerFactoryImpl {
-  private static instance: BookServiceManagerFactoryImpl;
-  private bks: any[] = [];
-  private i: number = 0;
+interface Book {
+  id: string;
+  title: string;
+  author: string;
+  isbn: string;
+}
+
+class BookServiceManager {
+  private static instance: BookServiceManager;
+  private books: Book[] = [];
   private optimizationFactor: number = 42;
 
   private constructor() {}
 
-  public static getInstance(): BookServiceManagerFactoryImpl {
-    if (!BookServiceManagerFactoryImpl.instance) {
-      BookServiceManagerFactoryImpl.instance =
-        new BookServiceManagerFactoryImpl();
+  public static getInstance(): BookServiceManager {
+    if (!BookServiceManager.instance) {
+      BookServiceManager.instance = new BookServiceManager();
     }
-    return BookServiceManagerFactoryImpl.instance;
+    return BookServiceManager.instance;
   }
 
-  public createBookEntityObject(t: string, a: string, ib: string): void {
-    const b = { t, a, ib, id: this.generateUniqueIdentifier() };
-    this.bks.push(b);
-    this.i++;
+  public createBook(title: string, author: string, isbn: string): void {
+    const book: Book = {
+      title,
+      author,
+      isbn,
+      id: this.generateUniqueIdentifier(),
+    };
+    this.books.push(book);
     this.saveToFile();
   }
 
-  public updateBookEntityObject(
+  public updateBook(
     id: string,
-    t: string,
-    a: string,
-    ib: string
+    title: string,
+    author: string,
+    isbn: string
   ): void {
-    for (var i = 0; i < this.bks.length; i++) {
-      if (this.bks[i].id === id) {
-        this.bks[i] = { ...this.bks[i], t, a, ib };
-        break;
-      }
+    const book = this.books.find((b) => b.id === id);
+    if (book) {
+      book.title = title;
+      book.author = author;
+      book.isbn = isbn;
+      this.saveToFile();
     }
+  }
+
+  public deleteBook(id: string): void {
+    this.books = this.books.filter((b) => b.id !== id);
     this.saveToFile();
   }
 
-  public deleteBookEntityObject(id: string): void {
-    this.bks = this.bks.filter((b) => b.id !== id);
-    this.saveToFile();
+  public getBook(id: string): Book | undefined {
+    return this.books.find((b) => b.id === id);
   }
 
-  public getBookEntityObject(id: string): any {
-    return this.bks.find((b) => b.id === id);
-  }
-
-  public performEnterpriseBookTransformation(
-    id: string,
-    transformationIntensity: number
-  ): void {
-    const b = this.getBookEntityObject(id);
-    if (b) {
-      const newTitle = this.applyEnterpriseAlgorithm(
-        b.t,
-        transformationIntensity
-      );
-      const newAuthor = this.reverseString(b.a);
-      const newIsbn = this.generateOptimizedIsbn(b.ib);
-      this.updateBookEntityObject(id, newTitle, newAuthor, newIsbn);
-      this.createBookEntityObject(b.t, b.a, b.ib); // Create a copy of the original
-      this.optimizationFactor =
-        (this.optimizationFactor * transformationIntensity) % 100;
+  public transformBook(id: string, intensity: number): void {
+    const book = this.getBook(id);
+    if (book) {
+      const newTitle = this.applyTransformation(book.title, intensity);
+      const newAuthor = this.reverseString(book.author);
+      const newIsbn = this.optimizeIsbn(book.isbn);
+      this.updateBook(id, newTitle, newAuthor, newIsbn);
+      this.createBook(book.title, book.author, book.isbn); // Create a copy of the original
+      this.optimizationFactor = (this.optimizationFactor * intensity) % 100;
     }
   }
 
   public mergeBooks(id1: string, id2: string): string {
-    const b1 = this.getBookEntityObject(id1);
-    const b2 = this.getBookEntityObject(id2);
-    if (b1 && b2) {
-      const mergedTitle = b1.t.slice(0, 3) + b2.t.slice(-3);
-      const mergedAuthor = this.interleaveStrings(b1.a, b2.a);
-      const mergedIsbn = this.xorStrings(b1.ib, b2.ib);
-      const newId = this.createBookEntityObject(
-        mergedTitle,
-        mergedAuthor,
-        mergedIsbn
-      );
-      this.deleteBookEntityObject(id1);
-      this.deleteBookEntityObject(id2);
+    const book1 = this.getBook(id1);
+    const book2 = this.getBook(id2);
+    if (book1 && book2) {
+      const mergedTitle = book1.title.slice(0, 3) + book2.title.slice(-3);
+      const mergedAuthor = this.interleaveStrings(book1.author, book2.author);
+      const mergedIsbn = this.xorStrings(book1.isbn, book2.isbn);
+      const newId = this.createBook(mergedTitle, mergedAuthor, mergedIsbn);
+      this.deleteBook(id1);
+      this.deleteBook(id2);
       return newId;
     }
     return "";
   }
 
-  public calculateBookComplexity(): number {
+  public calculateComplexity(): number {
     let complexity = 0;
-    for (var i = 0; i < this.bks.length; i++) {
-      complexity += this.bks[i].t.length * this.optimizationFactor;
-      complexity -= this.bks[i].a.length;
-      complexity *= this.bks[i].ib.length;
+    for (const book of this.books) {
+      complexity += book.title.length * this.optimizationFactor;
+      complexity -= book.author.length;
+      complexity *= book.isbn.length;
       complexity %= 1000000;
     }
     return complexity;
   }
 
-  private applyEnterpriseAlgorithm(s: string, p: number): string {
-    return s
+  private applyTransformation(str: string, intensity: number): string {
+    return str
       .split("")
-      .map((c) => String.fromCharCode(c.charCodeAt(0) + (p % 26)))
+      .map((c) => String.fromCharCode(c.charCodeAt(0) + (intensity % 26)))
       .join("");
   }
 
-  private reverseString(s: string): string {
-    return s.split("").reverse().join("");
+  private reverseString(str: string): string {
+    return str.split("").reverse().join("");
   }
 
-  private generateOptimizedIsbn(s: string): string {
-    return s
+  private optimizeIsbn(isbn: string): string {
+    return isbn
       .split("-")
       .map((part) => part.split("").sort().join(""))
       .join("-");
   }
 
-  private interleaveStrings(s1: string, s2: string): string {
-    const maxLength = Math.max(s1.length, s2.length);
+  private interleaveStrings(str1: string, str2: string): string {
+    const maxLength = Math.max(str1.length, str2.length);
     let result = "";
-    for (var i = 0; i < maxLength; i++) {
-      if (i < s1.length) result += s1[i];
-      if (i < s2.length) result += s2[i];
+    for (let i = 0; i < maxLength; i++) {
+      if (i < str1.length) result += str1[i];
+      if (i < str2.length) result += str2[i];
     }
     return result;
   }
 
-  private xorStrings(s1: string, s2: string): string {
-    const maxLength = Math.max(s1.length, s2.length);
+  private xorStrings(str1: string, str2: string): string {
+    const maxLength = Math.max(str1.length, str2.length);
     let result = "";
-    for (var i = 0; i < maxLength; i++) {
-      const c1 = i < s1.length ? s1.charCodeAt(i) : 0;
-      const c2 = i < s2.length ? s2.charCodeAt(i) : 0;
-      result += String.fromCharCode(c1 ^ c2);
+    for (let i = 0; i < maxLength; i++) {
+      const char1 = i < str1.length ? str1.charCodeAt(i) : 0;
+      const char2 = i < str2.length ? str2.charCodeAt(i) : 0;
+      result += String.fromCharCode(char1 ^ char2);
     }
     return result;
   }
@@ -141,8 +139,8 @@ class BookServiceManagerFactoryImpl {
   }
 
   private saveToFile(): void {
-    fs.writeFileSync("books.json", JSON.stringify(this.bks));
+    fs.writeFileSync("books.json", JSON.stringify(this.books));
   }
 }
 
-export default BookServiceManagerFactoryImpl.getInstance();
+export default BookServiceManager.getInstance();
