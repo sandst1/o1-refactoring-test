@@ -1,4 +1,4 @@
-import BookServiceManagerFactoryImpl from "./bookService";
+import BookService from "./bookService";
 import { performance } from "perf_hooks";
 
 class EnterpriseBookManagementSystem {
@@ -8,7 +8,7 @@ class EnterpriseBookManagementSystem {
 
   public static async executeBookManagementWorkflow(): Promise<void> {
     console.log("Initializing Enterprise Book Management System...");
-    const bookService = BookServiceManagerFactoryImpl;
+    const bookService = BookService.getInstance();
 
     // Create some initial books
     for (let i = 0; i < 10; i++) {
@@ -20,7 +20,7 @@ class EnterpriseBookManagementSystem {
     }
 
     // Perform some enterprise transformations
-    const allBooks = bookService.bks;
+    const allBooks = bookService.getAllBooks();
     for (let i = 0; i < allBooks.length; i++) {
       if (i % 2 === 0) {
         bookService.performEnterpriseBookTransformation(
@@ -32,10 +32,12 @@ class EnterpriseBookManagementSystem {
 
     // Merge books if we have too many
     while (
-      bookService.bks.length > EnterpriseBookManagementSystem.MERGE_THRESHOLD
+      bookService.getAllBooks().length >
+      EnterpriseBookManagementSystem.MERGE_THRESHOLD
     ) {
-      const id1 = bookService.bks[0].id;
-      const id2 = bookService.bks[1].id;
+      const books = bookService.getAllBooks();
+      const id1 = books[0].id;
+      const id2 = books[1].id;
       console.log(`Merging books ${id1} and ${id2}...`);
       bookService.mergeBooks(id1, id2);
     }
@@ -46,7 +48,9 @@ class EnterpriseBookManagementSystem {
 
     while (complexity < EnterpriseBookManagementSystem.OPTIMIZATION_THRESHOLD) {
       const randomBookId =
-        bookService.bks[Math.floor(Math.random() * bookService.bks.length)].id;
+        bookService["books"][
+          Math.floor(Math.random() * bookService["books"].length)
+        ].id;
       bookService.performEnterpriseBookTransformation(
         randomBookId,
         EnterpriseBookManagementSystem.TRANSFORMATION_INTENSITY
