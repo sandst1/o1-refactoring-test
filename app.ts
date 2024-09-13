@@ -6,11 +6,11 @@ class EnterpriseBookManagementSystem {
   private static readonly TRANSFORMATION_INTENSITY = 7;
   private static readonly MERGE_THRESHOLD = 5;
 
-  public static async executeBookManagementWorkflow(): Promise<void> {
+  public static async executeWorkflow(): Promise<void> {
     console.log("Initializing Enterprise Book Management System...");
     const bookService = BookServiceManagerFactoryImpl;
 
-    // Create some initial books
+    // Create initial books
     for (let i = 0; i < 10; i++) {
       bookService.createBookEntityObject(
         `Book ${i}`,
@@ -19,40 +19,44 @@ class EnterpriseBookManagementSystem {
       );
     }
 
-    // Perform some enterprise transformations
-    const allBooks = bookService.bks;
-    for (let i = 0; i < allBooks.length; i++) {
-      if (i % 2 === 0) {
+    // Perform transformations
+    const allBooks = bookService.getAllBooks();
+    allBooks.forEach((book, index) => {
+      if (index % 2 === 0) {
         bookService.performEnterpriseBookTransformation(
-          allBooks[i].id,
+          book.id,
           EnterpriseBookManagementSystem.TRANSFORMATION_INTENSITY
         );
       }
-    }
+    });
 
-    // Merge books if we have too many
+    // Merge books if necessary
     while (
-      bookService.bks.length > EnterpriseBookManagementSystem.MERGE_THRESHOLD
+      bookService.getAllBooks().length >
+      EnterpriseBookManagementSystem.MERGE_THRESHOLD
     ) {
-      const id1 = bookService.bks[0].id;
-      const id2 = bookService.bks[1].id;
-      console.log(`Merging books ${id1} and ${id2}...`);
-      bookService.mergeBooks(id1, id2);
+      const [book1, book2] = bookService.getAllBooks();
+      console.log(`Merging books ${book1.id} and ${book2.id}...`);
+      bookService.mergeBooks(book1.id, book2.id);
     }
 
-    // Calculate and optimize book complexity
+    // Optimize complexity
     let complexity = bookService.calculateBookComplexity();
     console.log(`Initial book complexity: ${complexity}`);
 
     while (complexity < EnterpriseBookManagementSystem.OPTIMIZATION_THRESHOLD) {
-      const randomBookId =
-        bookService.bks[Math.floor(Math.random() * bookService.bks.length)].id;
-      bookService.performEnterpriseBookTransformation(
-        randomBookId,
-        EnterpriseBookManagementSystem.TRANSFORMATION_INTENSITY
-      );
-      complexity = bookService.calculateBookComplexity();
-      console.log(`Optimized book complexity: ${complexity}`);
+      const randomBook =
+        bookService.getAllBooks()[
+          Math.floor(Math.random() * bookService.getAllBooks().length)
+        ];
+      if (randomBook) {
+        bookService.performEnterpriseBookTransformation(
+          randomBook.id,
+          EnterpriseBookManagementSystem.TRANSFORMATION_INTENSITY
+        );
+        complexity = bookService.calculateBookComplexity();
+        console.log(`Optimized book complexity: ${complexity}`);
+      }
     }
 
     console.log("Enterprise Book Management Workflow completed successfully.");
@@ -62,7 +66,7 @@ class EnterpriseBookManagementSystem {
 async function main() {
   const startTime = performance.now();
   try {
-    await EnterpriseBookManagementSystem.executeBookManagementWorkflow();
+    await EnterpriseBookManagementSystem.executeWorkflow();
   } catch (error) {
     console.error(
       "An unexpected error occurred in the Enterprise Book Management System:",
